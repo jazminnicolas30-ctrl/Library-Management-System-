@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCC Digital Library System — Complete Database & Application</title>
+<style>
+:root{--wine:#4b0809;--wine-dark:#2c0506;--ink:#29252b;--muted:#898492;--lav:#aaa3d3;--line:#eee9eb;--green:#438755}
+*{box-sizing:border-box}
+body{margin:0;background:#f4f3f4;color:var(--ink);font:12px Arial,Helvetica,sans-serif}
+.app{display:flex;min-height:100vh;background:#fff;overflow:hidden}
+
+/* Sidebar */
+.sidebar{width:212px;flex:0 0 212px;display:flex;flex-direction:column;color:#fff;background:linear-gradient(90deg,#0003,transparent 70%),linear-gradient(180deg,var(--wine-dark),var(--wine) 55%,#350607);border-right:2px solid #c8c4c4}
+.brand{display:flex;align-items:center;gap:9px;padding:15px 17px 18px;min-height:91px;border-bottom:1px solid #ffffff12}
+.logo{width:37px;height:37px;border:3px solid #d9412e;outline:1px solid #f4b442;border-radius:50%;display:grid;place-items:center;color:#f8bd48;font-weight:bold;font-size:21px;text-shadow:0 1px 2px #000}
+.brand strong{display:block;font-size:18px;line-height:1.05;letter-spacing:.4px}.brand small{font-size:9px;letter-spacing:.7px}
+.nav a{height:46px;display:flex;align-items:center;gap:17px;padding:0 18px;color:#f8eeee;text-decoration:none;border-bottom:1px solid #0002;font-size:11px;cursor:pointer}
+.nav a:hover,.nav a.active{background:#0003}.nav .ico{width:20px;text-align:center;font-size:19px}
+.sidebar-footer{margin-top:auto;padding:22px 18px;min-height:111px;border-top:2px solid #ffffff9c;display:flex;gap:13px;align-items:flex-start;font-size:10px;line-height:1.5;color:#eee5e5}
+
+/* Main Content Area */
+main{flex:1;min-width:0;background:#fff;display:flex;flex-direction:column;height:100vh;overflow-y:auto}
+.topbar{height:66px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 27px 0 30px;border-bottom:1px solid #f1eff0}
+.search{width:min(350px,48%);height:37px;border:1px solid #c9c6cb;background:#f8f7f9;border-radius:24px;display:flex;align-items:center;gap:9px;padding:0 14px;color:#aaa7b2}
+.search input{width:100%;min-width:0;border:0;outline:0;background:transparent;font-size:11px}
+.top-actions{display:flex;align-items:center;gap:24px}.bell{position:relative;font-size:23px}.bell:after{content:"";position:absolute;top:1px;right:-1px;width:7px;height:7px;border-radius:50%;background:#d9232e}
+.profile{display:flex;align-items:center;gap:7px;cursor:pointer}.avatar{width:31px;height:31px;border-radius:50%;display:grid;place-items:center;background:#7b171b;color:white;border:2px solid #d6c4c4;font-size:18px}.profile small{font-size:10px}
+
+.content{padding:22px 31px 24px;flex:1}
+h1{font-size:27px;margin:0 0 3px;letter-spacing:-.5px}.subtitle{margin:0;color:var(--lav);font-size:11px}
+
+/* Page Views System */
+.page-view{display:none}
+.page-view.active-page{display:block}
+
+/* Shared Components & Elements */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin:29px 0 35px}
+.stat{display:flex;align-items:center;gap:12px;min-width:0}
+.stat-icon{width:52px;height:52px;flex:0 0 52px;border-radius:50%;display:grid;place-items:center;color:white;font-size:24px;font-weight:bold}
+.stat-icon.wine{background:#80191c}.stat-icon.green{background:#367a4d}.stat-icon.yellow{background:#ffd51c;color:#222}.stat-icon.purple{background:#a04fff}.stat-icon.black{background:#270606}
+.stat-label{font-size:10px;color:#898492;white-space:nowrap}.stat-number{font-size:23px;line-height:1.05;font-weight:bold;color:#222}
+
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:12px}
+select,input[type=date]{height:28px;min-width:140px;border:1px solid #aaa5ab;border-radius:3px;background:white;color:#5b5660;font:10px Arial;padding:3px 7px}
+.table-wrap{width:100%;overflow-x:auto}
+table{width:100%;border-collapse:collapse;white-space:nowrap;font-size:10px}
+thead th{text-align:left;font-weight:400;color:#716b76;padding:10px 7px;border-bottom:1px solid #f0edef}
+tbody td{padding:10px 7px;border-bottom:1px solid #f6f3f4;color:#5e5962}
+tbody tr:hover{background:#fcf9f9}
+.cover{width:25px;height:33px;border-radius:4px;display:grid;place-items:center;color:#fff;font-size:16px;box-shadow:0 1px 3px #0002}
+.cover.one{background:linear-gradient(135deg,#273e37,#91a68b)}.cover.two{background:linear-gradient(135deg,#f15b53,#f8b0a7)}.cover.three{background:linear-gradient(135deg,#233f68,#5b8bb6)}.cover.four{background:linear-gradient(135deg,#7a777a,#b2a2a6)}.cover.five{background:linear-gradient(135deg,#126d82,#74bac4)}.cover.six{background:linear-gradient(135deg,#005e51,#54a28b)}.cover.seven{background:linear-gradient(135deg,#006a27,#61d94d)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:0 19px;height:42px;min-width:125px;border-radius:7px;cursor:pointer;font-size:11px}
+.btn-outline{border:1px solid #8d5b5d;background:#fff;color:#713234}.btn-primary{border:1px solid var(--wine);background:var(--wine);color:#fff}
+.btn:hover{filter:brightness(.96)}
+.message{min-height:16px;margin-top:12px;color:#4c8048;font-size:11px}
+
+/* Forms layout matching individual source files */
+.book-form, .member-form{display:grid;grid-template-columns:minmax(230px,.85fr) minmax(220px,1fr) minmax(220px,1fr);column-gap:36px;row-gap:18px;margin-top:20px}
+.field{min-width:0;margin-bottom:1px}
+.field label{display:block;font-size:12px;font-weight:bold;margin-bottom:10px;color:#28242a}
+.required{color:#a51c20}
+.field input,.field select,.field textarea{width:100%;border:0;border-bottom:1px solid #e5e0e3;background:#fff;padding:5px 0;color:#333;font:12px Arial;outline:none}
+.field input,.field select{height:30px}
+.field textarea{height:70px;resize:vertical}
+.field-row{display:flex;align-items:center;gap:7px;color:#37323a;font-size:12px;min-height:19px}
+.field-row input,.field-row select{flex:1;min-width:0}
+.actions{display:flex;justify-content:flex-end;gap:14px;margin-top:30px}
+
+/* Login Page Overlay Layout */
+#loginView{position:fixed;inset:0;background:radial-gradient(ellipse at 55% 52%,#681414 0%,#3b0809 48%,#1b0304 100%);z-index:9999;display:flex;align-items:center;justify-content:center;color:#fff}
+.login-card{width:320px;padding:30px;background:rgba(63,9,13,.88);border:1px solid #69313a;border-radius:17px;box-shadow:0 0 20px #0008}
+.login-card input{width:100%;height:30px;margin-bottom:15px;padding:5px 8px;border-radius:3px;border:1px solid #d5d0d0;color:#242020}
+</style>
+</head>
+<body>
+
+<!-- LOGIN VIEW (Source: Login.html) -->
+<div id="loginView">
+  <div class="login-card">
+    <h2 style="margin-top:0;">PCC Digital Library</h2>
+    <p style="font-size:10px; color:#d2bfc0; margin-bottom:20px;">Sign in to your library account</p>
+    <form id="loginForm">
+      <label style="font-size:10px; display:block; margin-bottom:5px;">Email</label>
+      <input type="email" id="loginEmail" value="Admin@pccnet.edu.ph" required>
+      <label style="font-size:10px; display:block; margin-bottom:5px;">Password</label>
+      <input type="password" id="loginPass" value="password123" required>
+      <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px; height:32px;">Sign in</button>
+      <p id="loginMsg" style="font-size:10px; color:#ffd6a6; margin-top:10px; text-align:center;"></p>
+    </form>
+  </div>
+</div>
+
+<div class="app">
+  <!-- SIDEBAR NAVIGATION (Universal across all templates) -->
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">P</div><div><strong>PCC</strong><small>DIGITAL LIBRARY</small></div></div>
+    <nav class="nav" aria-label="Main navigation">
+      <a data-target="homeView" class="active"><span class="ico">◆</span>Home</a>
+      <a data-target="booksView"><span class="ico">▣</span>Books</a>
+      <a data-target="addBookView"><span class="ico">⊕</span>Add Books</a>
+      <a data-target="membersView"><span class="ico">♟</span>Members</a>
+      <a data-target="registerMemberView"><span class="ico">♟＋</span>Register Member</a>
+      <a data-target="borrowingView"><span class="ico">▤</span>Borrowing</a>
+      <a data-target="returningView"><span class="ico">↶</span>Returning</a>
+      <a data-target="profileView"><span class="ico">●</span>Profile</a>
+      <a data-target="settingsView"><span class="ico">⚙</span>Settings</a>
+    </nav>
+    <div class="sidebar-footer"><span style="font-size:21px">▣</span><span>Better Readers,<br>Build a Brighter<br>Future!</span></div>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <label class="search"><span>☰</span><input type="search" id="globalSearchInput" placeholder="Hinted search text" aria-label="Search"><span>⌕</span></label>
+      <div class="top-actions">
+        <span class="bell" aria-label="Notifications">♧</span>
+        <div class="profile" onclick="switchView('profileView')"><span class="avatar">●</span><small>Profile ⌄</small></div>
+      </div>
+    </header>
+
+    <!-- 1. HOME / DASHBOARD (Source: Home.html) -->
+    <section id="homeView" class="page-view active-page content">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div><h1>Good day, Admin!</h1><p class="subtitle">Manage your library, track books, and serve your readers all in one place.</p></div>
+        <div style="font-size:38px;">📚</div>
+      </div>
+      <section class="stats">
+        <div class="stat"><div class="stat-icon wine">▤</div><div><div class="stat-label">Total Books</div><div class="stat-number">1,221</div></div></div>
+        <div class="stat"><div class="stat-icon green">♟</div><div><div class="stat-label">Total Members</div><div class="stat-number">456</div></div></div>
+        <div class="stat"><div class="stat-icon yellow">⟳</div><div><div class="stat-label">Books Borrowed</div><div class="stat-number">67</div></div></div>
+        <div class="stat"><div class="stat-icon purple">▦</div><div><div class="stat-label">Overdue Books</div><div class="stat-number">13</div></div></div>
+      </section>
+      <h2 style="font-size:13px; margin-bottom:10px;">Recent Books Collection</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Cover</th><th>Title</th><th>Author</th><th>Category</th><th>Status</th></tr></thead>
+          <tbody id="homeBookRows">
+            <tr><td><div class="cover one">▤</div></td><td><strong>Whiskey</strong></td><td>T. Kira Madden</td><td>Fiction</td><td style="color:#38814e">Available</td></tr>
+            <tr><td><div class="cover two">▤</div></td><td><strong>Illuminae</strong></td><td>Jay Kristoff</td><td>Multimedia</td><td style="color:#38814e">Available</td></tr>
+            <tr><td><div class="cover three">▤</div></td><td><strong>The Great Gatsby</strong></td><td>Jesmyn Ward</td><td>Academic Journals</td><td style="color:#38814e">Available</td></tr>
+            <tr><td><div class="cover four">▤</div></td><td><strong>Becoming</strong></td><td>Michelle Obama</td><td>Non-Fiction</td><td style="color:#e1ae00">Checked Out</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 2. AVAILABLE BOOKS (Source: Available Books.html) -->
+    <section id="booksView" class="page-view content">
+      <h1>All books</h1>
+      <p class="subtitle">Browse and manage your library collection.</p>
+      <div class="toolbar" style="margin-top:20px;">
+        <input type="search" id="allBooksSearchInput" placeholder="Search collection..." style="width:250px;">
+        <select id="mainCategoryFilter">
+          <option value="">All Categories</option><option>Fiction</option><option>Motivation</option><option>Romance</option><option>Non-Fiction</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Cover</th><th>Title</th><th>Author</th><th>Category</th><th>Status</th></tr></thead>
+          <tbody id="fullBookInventoryRows">
+            <tr data-category="Fiction" data-status="Available"><td><div class="cover one">▤</div></td><td><strong>Wallflower</strong></td><td>Tara Hudson</td><td>Fiction</td><td style="color:#438a54">Available</td></tr>
+            <tr data-category="Motivation" data-status="Available"><td><div class="cover two">▤</div></td><td><strong>Sunrise</strong></td><td>Jay Koushi</td><td>Motivation</td><td style="color:#438a54">Available</td></tr>
+            <tr data-category="Romance" data-status="Available"><td><div class="cover three">▤</div></td><td><strong>The Great Gatsby</strong></td><td>Jasper Hill</td><td>Romance</td><td style="color:#438a54">Available</td></tr>
+            <tr data-category="Non-Fiction" data-status="Checked Out"><td><div class="cover four">▤</div></td><td><strong>Becoming</strong></td><td>Michelle Obama</td><td>Non-Fiction</td><td style="color:#e1b92c">Checked Out</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 3. ADD BOOKS (Source: Add Books.html) -->
+    <section id="addBookView" class="page-view content">
+      <h1>Add New Books</h1>
+      <p class="subtitle">Enter book details to add a title to the digital library.</p>
+      <form id="addBookForm">
+        <div class="book-form">
+          <div class="field"><label>Book Title <span class="required">*</span></label><input id="newBookTitle" required placeholder="e.g. Clean Code"></div>
+          <div class="field"><label>Author <span class="required">*</span></label><input id="newBookAuthor" required placeholder="e.g. Robert C. Martin"></div>
+          <div class="field"><label>ISBN <span class="required">*</span></label><input id="newBookIsbn" required placeholder="e.g. 978-0000000000"></div>
+          <div class="field"><label>Category <span class="required">*</span></label><select><option>Fiction</option><option>Technology</option><option>Science</option><option>History</option></select></div>
+        </div>
+        <div class="actions"><button type="submit" class="btn btn-primary">Add Book</button></div>
+        <p class="message" id="addBookMsg"></p>
+      </form>
+    </section>
+
+    <!-- 4. MEMBERS DIRECTORY & DB (Source: Members.html) -->
+    <section id="membersView" class="page-view content">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div><h1>Members</h1><p class="subtitle">Manage library members and accounts.</p></div>
+        <button class="btn btn-primary" onclick="switchView('registerMemberView')" style="height:34px; min-width:auto; padding:0 14px;">+ Add Member</button>
+      </div>
+      <section class="stats" style="margin:20px 0;">
+        <div class="stat"><div class="stat-icon red">♟</div><div><div class="stat-label">Total Members</div><div class="stat-number" id="dbTotalMembers">456</div></div></div>
+        <div class="stat"><div class="stat-icon green">♟</div><div><div class="stat-label">Active Members</div><div class="stat-number" id="dbActiveMembers">320</div></div></div>
+        <div class="stat"><div class="stat-icon yellow">♧</div><div><div class="stat-label">Pending Approval</div><div class="stat-number">18</div></div></div>
+        <div class="stat"><div class="stat-icon black">♧</div><div><div class="stat-label">Suspended</div><div class="stat-number">17</div></div></div>
+      </section>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Member</th><th>Member ID</th><th>Email</th><th>Role</th><th>Date Joined</th><th>Status</th></tr></thead>
+          <tbody id="memberDatabaseRows">
+            <!-- Loaded dynamically from original database array -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 5. REGISTER MEMBER (Source: Register Member.html) -->
+    <section id="registerMemberView" class="page-view content">
+      <h1>Register New Member</h1>
+      <p class="subtitle">Enter member information to create a library account.</p>
+      <form id="registerMemberForm">
+        <div class="member-form">
+          <div class="field"><label>Full Name <span class="required">*</span></label><input id="regName" required placeholder="e.g. John Cruz"></div>
+          <div class="field"><label>Student/Employee ID <span class="required">*</span></label><input id="regId" required placeholder="e.g. 2025-00123"></div>
+          <div class="field"><label>Email Address <span class="required">*</span></label><input id="regEmail" type="email" required placeholder="member@pccnet.edu.ph"></div>
+          <div class="field"><label>Member Type <span class="required">*</span></label><select id="regRole"><option>Student</option><option>Faculty</option><option>Staff</option></select></div>
+        </div>
+        <div class="actions"><button type="submit" class="btn btn-primary">Register Member</button></div>
+        <p class="message" id="registerMemberMsg"></p>
+      </form>
+    </section>
+
+    <!-- 6. BORROWING RECORDS (Source: Borrowing.html) -->
+    <section id="borrowingView" class="page-view content">
+      <h1>Borrowing Books</h1>
+      <p class="subtitle">View and manage all book borrowing records</p>
+      <div class="table-wrap" style="margin-top:20px;">
+        <table>
+          <thead><tr><th>ID</th><th>Title</th><th>Member</th><th>Borrowed Date</th><th>Due Date</th><th>Status</th></tr></thead>
+          <tbody id="borrowingRecordsRows">
+            <tr data-member="John" data-book="White Nights"><td>BR-001</td><td>White Nights</td><td>John</td><td>September 5, 2025</td><td>September 12, 2025</td><td style="color:#69b2d6">Borrowed</td></tr>
+            <tr data-member="Jay" data-book="Sunrise"><td>BR-002</td><td>Sunrise</td><td>Jay</td><td>September 6, 2025</td><td>September 13, 2025</td><td style="color:#69b2d6">Borrowed</td></tr>
+            <tr data-member="Ulee" data-book="The Great Gatsby"><td>BR-003</td><td>The Great Gatsby</td><td>Ulee</td><td>September 6, 2025</td><td>September 20, 2025</td><td style="color:#438a54">Returned</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 7. RETURNING RECORDS (Source: Returning.html) -->
+    <section id="returningView" class="page-view content">
+      <h1>Returning Books</h1>
+      <p class="subtitle">View and manage books that have been returned</p>
+      <div class="table-wrap" style="margin-top:20px;">
+        <table>
+          <thead><tr><th>ID</th><th>Title</th><th>Member</th><th>Returned Date</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr data-member="Michael"><td>RT-001</td><td>White Nights</td><td>Michael</td><td>September 5, 2025</td><td style="color:#4f8039">Returned</td></tr>
+            <tr data-member="Felix"><td>RT-002</td><td>Sunrise</td><td>Felix</td><td>September 6, 2025</td><td style="color:#4f8039">Returned</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 8. USER PROFILE (Source: Profile.html) -->
+    <section id="profileView" class="page-view content">
+      <h1>My Profile</h1>
+      <p class="subtitle">View and manage your account information and preferences</p>
+      <div style="margin-top:25px; display:flex; gap:30px; align-items:center;">
+        <div style="width:80px; height:80px; border-radius:50%; background:#7b171b; color:#fff; display:grid; place-items:center; font-size:36px; border:4px solid #d6c4c4;">●</div>
+        <div>
+          <h2 id="profileDisplayName" style="margin:0 0 5px; font-size:20px;">Library Admin</h2>
+          <div style="color:#7b7581; font-size:11px;">Administrator</div>
+          <div style="color:#438755; font-size:11px; margin-top:4px;">● Active</div>
+        </div>
+      </div>
+      <div style="margin-top:30px; max-width:400px;">
+        <p><strong>Email:</strong> <span id="profileDisplayEmail">Admin@pccnet.edu.ph</span></p>
+        <p><strong>Phone:</strong> +63 999 999 9999</p>
+        <p><strong>Username:</strong> Libraryadmin</p>
+      </div>
+    </section>
+
+    <!-- 9. SETTINGS & SYSTEM INFO (Source: Settings.html) -->
+    <section id="settingsView" class="page-view content">
+      <h1>Settings</h1>
+      <p class="subtitle">Manage your system preferences and account settings.</p>
+      <form id="systemSettingsForm" style="margin-top:25px; max-width:450px;">
+        <div class="field" style="margin-bottom:15px;"><label>System Name</label><input id="settingSysName" value="PCC Digital Library"></div>
+        <div class="field" style="margin-bottom:15px;"><label>Language</label><select><option>English</option><option>Filipino</option></select></div>
+        <div class="field" style="margin-bottom:15px;"><label>Time Zone</label><select><option>(GMT +08:00) Philippines Standard Time</option></select></div>
+        <button type="submit" class="btn btn-primary" style="height:36px;">Save Changes</button>
+        <p id="settingsMsg" class="message"></p>
+      </form>
+      <div style="margin-top:40px; border-top:1px solid #eee; padding-top:20px;">
+        <h3 style="font-size:14px;">System Information</h3>
+        <p><strong>Version:</strong> v1.0.0[cite: 10]</p>
+        <p><strong>Last Updated:</strong> September 8, 2025[cite: 10]</p>
+        <p><strong>Developers:</strong> Jasmine and Chris[cite: 10]</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+/* 
+  DATABASE ARRAYS EXTRACTED FROM SOURCE FILES
+  - Members Database Array (From Members.html)
+*/
+const membersDatabase = [
+ {name:"Maria Santos", id:"PCC-3028-001", email:"Maria.santos@pcc.edu.ph", role:"Student", date:"September 6, 2025", status:"Active"},
+ {name:"John Reyes", id:"PCC-3028-002", email:"johnreyes@pcc.edu.ph", role:"Faculty", date:"September 14, 2025", status:"Active"},
+ {name:"Angela Cruz", id:"PCC-3028-003", email:"Angelacruz@pcc.edu.ph", role:"Student", date:"September 24, 2025", status:"Pending"},
+ {name:"Mark Dela Rosa", id:"PCC-3028-004", email:"Markdelarosa@pcc.edu.ph", role:"Staff", date:"September 22, 2025", status:"Active"},
+ {name:"Sofia Mendoza", id:"PCC-3028-005", email:"Sofiamendoza@pcc.edu.ph", role:"Student", date:"September 21, 2025", status:"Suspended"},
+ {name:"Carlo Garcia", id:"PCC-3028-006", email:"Carlogarcia@pcc.edu.ph", role:"Faculty", date:"September 15, 2025", status:"Active"}
+];
+
+/* Render Members Database Table dynamically */
+function renderMembersTable() {
+  const tbody = document.getElementById('memberDatabaseRows');
+  if(!tbody) return;
+  tbody.innerHTML = '';
+  membersDatabase.forEach(m => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${m.name}</strong></td>
+      <td>${m.id}</td>
+      <td>${m.email}</td>
+      <td>${m.role}</td>
+      <td>${m.date}</td>
+      <td style="color:${m.status==='Active'?'#438a54':m.status==='Pending'?'#a78c20':'#751919'}">${m.status}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+renderMembersTable();
+
+/* Single-Page Application (SPA) View Switcher Logic */
+function switchView(targetId) {
+  document.querySelectorAll('.page-view').forEach(el => el.classList.remove('active-page'));
+  const target = document.getElementById(targetId);
+  if(target) target.classList.add('active-page');
+
+  document.querySelectorAll('.nav a').forEach(a => {
+    if(a.getAttribute('data-target') === targetId) a.classList.add('active');
+    else a.classList.remove('active');
+  });
+}
+
+document.querySelectorAll('.nav a').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const target = link.getAttribute('data-target');
+    if(target) switchView(target);
+  });
+});
+
+/* Login Authentication Simulation (Source: Login.html) */
+document.getElementById('loginForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value;
+  document.getElementById('loginView').style.display = 'none';
+  document.getElementById('profileDisplayEmail').textContent = email;
+});
+
+/* Book Addition Form Handler (Source: Add Books.html) */
+document.getElementById('addBookForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const title = document.getElementById('newBookTitle').value;
+  document.getElementById('addBookMsg').textContent = `"${title}" is ready to be added to the library. Demo database updated.`;
+  e.target.reset();
+});
+
+/* Member Registration Form Handler (Source: Register Member.html) */
+document.getElementById('registerMemberForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = document.getElementById('regName').value;
+  const id = document.getElementById('regId').value;
+  const email = document.getElementById('regEmail').value;
+  const role = document.getElementById('regRole').value;
+  
+  // Push into database array dynamically
+  membersDatabase.push({
+    name: name,
+    id: id,
+    email: email,
+    role: role,
+    date: new Date().toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'}),
+    status: 'Active'
+  });
+  renderMembersTable();
+  
+  document.getElementById('registerMemberMsg').textContent = `Member "${name}" successfully registered into the database!`;
+  e.target.reset();
+});
+
+/* Settings Form Handler (Source: Settings.html) */
+document.getElementById('systemSettingsForm').addEventListener('submit', e => {
+  e.preventDefault();
+  document.getElementById('settingsMsg').textContent = 'Settings successfully saved for this session.';
+});
+</script>
+</body>
+</html>
